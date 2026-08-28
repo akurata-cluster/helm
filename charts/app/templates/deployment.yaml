@@ -1,0 +1,125 @@
+{{- range $name, $deploy := .Values.deployments }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "app.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $deploy.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
+  template:
+    metadata:
+      {{- with $deploy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 8 }}
+        {{- include "app.labels" $ | nindent 8 }}
+        {{- with $deploy.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "app.serviceAccountName" $ }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ dig "podSecurityContext" "runAsUser" 1000 $deploy }}
+        runAsGroup: {{ dig "podSecurityContext" "runAsGroup" 1000 $deploy }}
+        fsGroup: {{ dig "podSecurityContext" "fsGroup" 1000 $deploy }}
+        fsGroupChangePolicy: {{ dig "podSecurityContext" "fsGroupChangePolicy" "OnRootMismatch" $deploy }}
+        seccompProfile:
+          type: {{ dig "podSecurityContext" "seccompProfile" "type" "RuntimeDefault" $deploy }}
+      {{- with $deploy.runtimeClassName }}
+      runtimeClassName: {{ . }}
+      {{- end }}
+      {{- with $deploy.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+      {{- end }}
+      {{- with $deploy.initContainers }}
+      initContainers:
+        {{- include "app.secureContainers" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: {{ dig "securityContext" "readOnlyRootFilesystem" true $deploy }}
+            capabilities:
+              drop:
+                - ALL
+          image: "{{ $deploy.image.repository }}"
+          imagePullPolicy: {{ $deploy.image.pullPolicy }}
+          {{- with $deploy.workingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- with $deploy.command }}
+          command: {{ . | toJson }}
+          {{- end }}
+          {{- with $deploy.args }}
+          args: {{ . | toJson }}
+          {{- end }}
+          {{- with $deploy.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if or $deploy.env $deploy.envVars }}
+          env:
+            {{- with $deploy.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- range $varName, $varVal := $deploy.envVars }}
+            - name: {{ $varName }}
+              value: {{ quote $varVal }}
+            {{- end }}
+          {{- end }}
+          ports:
+          {{- range $deploy.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+          {{- end }}
+          {{- with $deploy.probes }}
+          livenessProbe:
+            {{- toYaml .livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .readinessProbe | nindent 12 }}
+          startupProbe:
+            {{- toYaml .startupProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml $deploy.resources | nindent 12 }}
+          {{- with $deploy.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with $deploy.sidecar }}
+      {{- include "app.secureContainers" . | nindent 8 }}
+      {{- end }}
+      {{- with $deploy.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $deploy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $deploy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $deploy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

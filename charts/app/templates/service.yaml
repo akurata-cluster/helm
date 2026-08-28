@@ -1,0 +1,36 @@
+{{- range $name, $deploy := .Values.deployments }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  {{- if $deploy.service.ingressTransport }}
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: openclaw-{{ $name }}-transport@kubernetescrd
+  {{- end }}
+  labels:
+    {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
+    {{- include "app.labels" $ | nindent 4 }}
+spec:
+  type: {{ $deploy.service.type }}
+  ports:
+  {{- range $deploy.service.ports }}
+    - port: {{ .port | default .containerPort }}
+      targetPort: {{ .name }}
+      protocol: {{ .protocol }}
+      name: {{ .name }}
+  {{- end }}
+  {{- with $deploy.sidecar }}
+  {{- range . }}
+  {{- range .ports }}
+    - port: {{ .port | default .containerPort }}
+      targetPort: {{ .name }}
+      protocol: {{ .protocol }}
+      name: {{ .name }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  selector: 
+    {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
+{{- end }}
