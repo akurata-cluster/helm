@@ -1,5 +1,5 @@
 {{- range $name, $deploy := .Values.deployments }}
-{{- if hasKey  $deploy "service" }}
+{{- if $deploy.service }}
 ---
 apiVersion: v1
 kind: Service

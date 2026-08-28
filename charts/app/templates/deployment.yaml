@@ -87,11 +87,13 @@ spec:
               value: {{ quote $varVal }}
             {{- end }}
           {{- end }}
+          {{- with ($deploy.service).ports }}
           ports:
-          {{- range $deploy.service.ports }}
+          {{- range . }}
             - name: {{ .name }}
               containerPort: {{ .containerPort }}
               protocol: {{ .protocol }}
+          {{- end }}
           {{- end }}
           {{- with $deploy.probes }}
           livenessProbe:
