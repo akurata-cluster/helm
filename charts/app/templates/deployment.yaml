@@ -9,7 +9,7 @@ metadata:
 spec:
   replicas: {{ $deploy.replicaCount }}
   strategy:
-    type: Recreate
+    type: {{ $deply.rolloutStrategy | default "Recreate" }}
   selector:
     matchLabels:
       {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
@@ -31,14 +31,16 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "app.serviceAccountName" $ }}
+      {{- if or $.Values.restricted $deploy.podSecurityContext }}
       securityContext:
-        runAsNonRoot: true
+        runAsNonRoot:  {{ dig "podSecurityContext" "runAsNonRoot" true $deploy }}
         runAsUser: {{ dig "podSecurityContext" "runAsUser" 1000 $deploy }}
         runAsGroup: {{ dig "podSecurityContext" "runAsGroup" 1000 $deploy }}
         fsGroup: {{ dig "podSecurityContext" "fsGroup" 1000 $deploy }}
         fsGroupChangePolicy: {{ dig "podSecurityContext" "fsGroupChangePolicy" "OnRootMismatch" $deploy }}
         seccompProfile:
           type: {{ dig "podSecurityContext" "seccompProfile" "type" "RuntimeDefault" $deploy }}
+      {{- end }}
       {{- with $deploy.runtimeClassName }}
       runtimeClassName: {{ . }}
       {{- end }}
@@ -51,13 +53,15 @@ spec:
       {{- end }}
       containers:
         - name: {{ $name }}
+          {{- if or $.Values.restricted $deploy.securityContext }}
           securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
+            runAsNonRoot: {{ dig "securityContext" "runAsNonRoot" true $deploy }}
+            allowPrivilegeEscalation: {{ dig "securityContext" "allowPrivilegeEscalation" false $deploy }}
             readOnlyRootFilesystem: {{ dig "securityContext" "readOnlyRootFilesystem" true $deploy }}
             capabilities:
               drop:
                 - ALL
+          {{- end }}
           image: "{{ $deploy.image.repository }}"
           imagePullPolicy: {{ $deploy.image.pullPolicy }}
           {{- with $deploy.workingDir }}
@@ -97,14 +101,20 @@ spec:
           startupProbe:
             {{- toYaml .startupProbe | nindent 12 }}
           {{- end }}
+          {{- with $deploy.resources }}
           resources:
-            {{- toYaml $deploy.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $deploy.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- with $deploy.sidecar }}
+      {{- if $.Values.restricted }}
       {{- include "app.secureContainers" . | nindent 8 }}
+      {{- else }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
       {{- with $deploy.volumes }}
       volumes:
