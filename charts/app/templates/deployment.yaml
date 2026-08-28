@@ -9,7 +9,7 @@ metadata:
 spec:
   replicas: {{ $deploy.replicaCount }}
   strategy:
-    type: {{ $deply.rolloutStrategy | default "Recreate" }}
+    type: {{ $deploy.rolloutStrategy | default "Recreate" }}
   selector:
     matchLabels:
       {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
