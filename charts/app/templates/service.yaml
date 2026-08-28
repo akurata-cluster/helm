@@ -1,4 +1,5 @@
 {{- range $name, $deploy := .Values.deployments }}
+{{- if hasKey  $deploy "service" }}
 ---
 apiVersion: v1
 kind: Service
@@ -33,4 +34,5 @@ spec:
   {{- end }}
   selector: 
     {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
+{{- end }}
 {{- end }}
