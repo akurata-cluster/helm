@@ -14,7 +14,7 @@ metadata:
     {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
     {{- include "app.labels" $ | nindent 4 }}
 spec:
-  type: {{ $deploy.service.type }}
+  type: {{ $deploy.service.type | default "ClusterIP" }}
   ports:
   {{- range $deploy.service.ports }}
     - port: {{ .port | default .containerPort }}
