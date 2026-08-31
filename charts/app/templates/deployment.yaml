@@ -62,9 +62,15 @@ spec:
             runAsNonRoot: {{ dig "securityContext" "runAsNonRoot" true $deploy }}
             allowPrivilegeEscalation: {{ dig "securityContext" "allowPrivilegeEscalation" false $deploy }}
             readOnlyRootFilesystem: {{ dig "securityContext" "readOnlyRootFilesystem" true $deploy }}
+            privileged: {{ dig "securityContext" "privileged" false $deploy }}
+            {{- if $.Values.restricted }}
             capabilities:
               drop:
                 - ALL
+            {{- else if ($deploy.securityContext).capabilities }}
+            capabilities:
+              {{- toYaml $deploy.securityContext.capabilities | nindent 14 }}
+            {{- end }}
           {{- end }}
           image: "{{ $deploy.image.repository }}"
           imagePullPolicy: {{ $deploy.image.pullPolicy }}
