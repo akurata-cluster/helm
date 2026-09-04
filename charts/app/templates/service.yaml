@@ -5,7 +5,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ $name }}
-  {{- if ($deploy.service).httpsBackend }}
+  {{- if ($deploy.service.ingress).httpsBackend }}
   annotations:
     traefik.ingress.kubernetes.io/service.serversscheme: https
     traefik.ingress.kubernetes.io/service.serverstransport: {{ $.Release.Namespace }}-{{ $name }}-transport@kubernetescrd
@@ -34,7 +34,7 @@ spec:
   {{- end }}
   selector: 
     {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
-{{- if ($deploy.service).httpsBackend }}
+{{- if ($deploy.service.ingress).httpsBackend }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport

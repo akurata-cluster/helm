@@ -5,7 +5,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $name }}
-  {{- if ne ($deploy.service).tls false }}
+  {{- if ne ($deploy.service.ingress).tls false }}
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $name }}-middleware@kubernetescrd
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
@@ -15,8 +15,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: {{ ($deploy.service.ingress).host | default (printf "%s.app.home" $name) }}
-    http:
+  - http:
       paths:
       - backend:
           service:
@@ -25,7 +24,12 @@ spec:
               name: http
         path: /
         pathType: ImplementationSpecific
-{{- if ne ($deploy.service).tls false }}
+    {{- if ($deploy.service.ingress).host }}
+    host: {{ $deploy.service.ingress.host }}
+    {{- else }}
+    host: {{ $name }}.app.home
+    {{- end }} 
+{{- if ne ($deploy.service.ingress).tls false }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
