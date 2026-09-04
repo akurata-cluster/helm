@@ -5,21 +5,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $name }}
-  {{- if $deploy.service.ingressTransport }}
+  {{- if ne ($deploy.service).tls false }}
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $name }}-middleware@kubernetescrd
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
   {{- end }}
   labels:
     {{- include "app.labels" $ | nindent 4 }}
 spec:
   ingressClassName: traefik
-  {{- if $deploy.service.ingressTransport }}
-  tls:
-  - hosts:
-    - {{ $name }}.app.home
-  {{- end }}
   rules:
   - host: {{ $name }}.app.home
     http:
@@ -31,14 +25,7 @@ spec:
               name: http
         path: /
         pathType: ImplementationSpecific
-{{- if $deploy.service.ingressTransport }}
----
-apiVersion: traefik.io/v1alpha1
-kind: ServersTransport
-metadata:
-  name: {{ $name }}-transport
-spec:
-  insecureSkipVerify: true
+{{- if ne ($deploy.service).tls false }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
