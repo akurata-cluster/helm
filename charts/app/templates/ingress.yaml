@@ -1,4 +1,5 @@
 {{- range $name, $deploy := .Values.deployments }}
+{{- if $deploy.service }}
 {{- if ($deploy.service.ingress).enabled }}
 ---
 apiVersion: networking.k8s.io/v1
@@ -39,6 +40,7 @@ spec:
   redirectScheme:
     scheme: https
     permanent: true
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
