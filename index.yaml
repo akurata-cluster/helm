@@ -3,6 +3,16 @@ entries:
   app:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-09-04T22:31:26.886978088Z"
+    description: Deploy applications to the home cluster
+    digest: ed0af2a9a1ab5a9429546454ced223b3d4b8914d60272a47c6a8446d42166672
+    name: app
+    type: application
+    urls:
+    - https://github.com/akurata-cluster/helm/releases/download/app-0.2.7/app-0.2.7.tgz
+    version: 0.2.7
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-09-04T21:53:29.513787899Z"
     description: Deploy applications to the home cluster
     digest: 0373b11524101d7e9c5b6a198fc2eb47f31066d0ba598ba754bad6e5dfb22010
@@ -171,4 +181,4 @@ entries:
     urls:
     - https://github.com/akurata-cluster/helm/releases/download/app-0.1.0/app-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-04T21:53:29.513867305Z"
+generated: "2026-09-04T22:31:26.887084664Z"
