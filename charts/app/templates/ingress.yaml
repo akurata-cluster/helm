@@ -15,7 +15,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: {{ $name }}.app.home
+  - host: {{ ($deploy.service.ingress).host | default (printf "%s.app.home" $name) }}
     http:
       paths:
       - backend:
