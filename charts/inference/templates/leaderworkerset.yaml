@@ -20,6 +20,10 @@ spec:
         hostNetwork: true
         hostIPC: true
         dnsPolicy: ClusterFirstWithHostNet
+        tolerations:
+          - key: nvidia.com/gpu
+            operator: Exists
+            effect: NoSchedule
         containers:
         - name: leader
           image: "{{ $lws.image.repository }}"
@@ -67,6 +71,10 @@ spec:
         hostNetwork: true
         hostIPC: true
         dnsPolicy: ClusterFirstWithHostNet
+        tolerations:
+          - key: nvidia.com/gpu
+            operator: Exists
+            effect: NoSchedule
         containers:
         - name: worker
           image: "{{ $lws.image.repository }}"
