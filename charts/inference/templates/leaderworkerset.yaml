@@ -34,7 +34,7 @@ spec:
           - configMapRef:
               name: {{ $name }}-env
           {{- with $lws.envFrom }}
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           resources:
             limits:
@@ -81,7 +81,7 @@ spec:
           - configMapRef:
               name: {{ $name }}-env
           {{- with $lws.envFrom }}
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           resources:
             limits:
