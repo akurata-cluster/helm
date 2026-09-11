@@ -1,0 +1,91 @@
+{{- range $name, $lws := .Values.leaderworkersets }}
+---
+apiVersion: leaderworkerset.x-k8s.io/v1
+kind: LeaderWorkerSet
+metadata:
+  name: {{ $name }}
+spec:
+  replicas: {{ $lws.leaderReplicaCount | default 1 }}
+  leaderWorkerTemplate:
+    size: {{ $lws.workerReplicaCount | default 2 }}
+    restartPolicy: {{ $lws.restartPolicy | default "RecreateGroupOnPodRestart" }}
+    leaderTemplate:
+      metadata:
+        labels:
+          role: leader
+      spec:
+        nodeSelector:
+          kubernetes.io/hostname: {{ $lws.leaderNode }}
+        runtimeClassName: nvidia
+        hostNetwork: true
+        hostIPC: true
+        dnsPolicy: ClusterFirstWithHostNet
+        containers:
+        - name: leader
+          image: "{{ $lws.image.repository }}"
+          imagePullPolicy: {{ $lws.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          command: ["/bin/bash", "-lc"]
+          args:
+          - |
+            {{- $lws.leaderCommand | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ $name }}-env
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- with ($lws.probes).livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with ($lws.probes).readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with ($lws.probes).startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $lws.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with $lws.volumes }}
+        volumes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+    workerTemplate:
+      spec:
+        nodeSelector:
+          kubernetes.io/hostname: {{ $lws.workerNode }}
+        runtimeClassName: nvidia
+        hostNetwork: true
+        hostIPC: true
+        dnsPolicy: ClusterFirstWithHostNet
+        containers:
+        - name: worker
+          image: "{{ $lws.image.repository }}"
+          imagePullPolicy: {{ $lws.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          command: ["/bin/bash", "-lc"]
+          args:
+          - |
+            {{- $lws.workerCommand | nindent 12 }}
+          envFrom:
+          - configMapRef:
+              name: {{ $name }}-env
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- with $lws.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with $lws.volumes }}
+        volumes:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+{{- end }}

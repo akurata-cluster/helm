@@ -1,0 +1,23 @@
+{{- range $name, $lws := .Values.leaderworkersets }}
+{{- if $lws.service }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
+    {{- include "inference.labels" $ | nindent 4 }}
+spec:
+  type: {{ $lws.service.type | default "ClusterIP" }}
+  ports:
+  {{- range $lws.service.ports }}
+    - port: {{ .port | default .containerPort }}
+      targetPort: {{ .name }}
+      protocol: {{ .protocol }}
+      name: {{ .name }}
+  {{- end }}
+  selector: 
+    {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 4}}
+{{- end }}
+{{- end }}

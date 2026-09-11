@@ -1,0 +1,30 @@
+{{- range $name, $lws := .Values.leaderworkersets }}
+{{- if $lws.service }}
+{{- if ($lws.service.ingress).enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "inference.labels" $ | nindent 4 }}
+spec:
+  ingressClassName: traefik
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ $name }}
+            port:
+              name: http
+        path: /
+        pathType: ImplementationSpecific
+    {{- if ($lws.service.ingress).host }}
+    host: {{ $lws.service.ingress.host }}
+    {{- else }}
+    host: {{ $name }}.inference.home
+    {{- end }} 
+{{- end }}
+{{- end }}
+{{- end }}

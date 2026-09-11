@@ -1,0 +1,17 @@
+{{- range $name, $lws := .Values.leaderworkersets }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-env
+data:
+  NCCL_IB_HCA: "rocep1s0f0,roceP2p1s0f0"
+  NCCL_IB_DISABLE: "0"
+  NCCL_NET: "IB"
+  NCCL_SOCKET_IFNAME: "enp1s0f0np0"
+  NCCL_IB_GID_INDEX: "3"
+  NCCL_DEBUG: "WARN"
+  HF_HUB_OFFLINE: "1"
+  PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
+  VLLM_CACHE_ROOT: "/root/.cache/vllm"
+{{- end }}
