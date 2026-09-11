@@ -31,8 +31,11 @@ spec:
           - |
             {{- $lws.leaderCommand | nindent 12 }}
           envFrom:
-            - configMapRef:
-                name: {{ $name }}-env
+          - configMapRef:
+              name: {{ $name }}-env
+          {{- with $deploy.envFrom }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             limits:
               nvidia.com/gpu: 1
@@ -77,6 +80,9 @@ spec:
           envFrom:
           - configMapRef:
               name: {{ $name }}-env
+          {{- with $deploy.envFrom }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             limits:
               nvidia.com/gpu: 1
