@@ -33,7 +33,7 @@ spec:
           envFrom:
           - configMapRef:
               name: {{ $name }}-env
-          {{- with $deploy.envFrom }}
+          {{- with $lws.envFrom }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
@@ -80,7 +80,7 @@ spec:
           envFrom:
           - configMapRef:
               name: {{ $name }}-env
-          {{- with $deploy.envFrom }}
+          {{- with $lws.envFrom }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
