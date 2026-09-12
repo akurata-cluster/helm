@@ -30,10 +30,17 @@ spec:
           imagePullPolicy: {{ $lws.image.pullPolicy }}
           securityContext:
             privileged: true
+            capabilities:
+              add: ["IPC_LOCK"]
           command: ["/bin/bash", "-lc"]
           args:
           - |
             {{- $lws.leaderCommand | nindent 12 }}
+          env:
+          - name: NODE_RANK
+            value: "0"
+          - name: VLLM_HOST_IP
+            value: "99.99.99.1"
           envFrom:
           - configMapRef:
               name: {{ $name }}-env
@@ -81,10 +88,17 @@ spec:
           imagePullPolicy: {{ $lws.image.pullPolicy }}
           securityContext:
             privileged: true
+            capabilities:
+              add: ["IPC_LOCK"]
           command: ["/bin/bash", "-lc"]
           args:
           - |
             {{- $lws.workerCommand | nindent 12 }}
+          env:
+          - name: NODE_RANK
+            value: "1"
+          - name: VLLM_HOST_IP
+            value: "99.99.99.2"
           envFrom:
           - configMapRef:
               name: {{ $name }}-env

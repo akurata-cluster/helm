@@ -5,13 +5,65 @@ kind: ConfigMap
 metadata:
   name: {{ $name }}-env
 data:
-  NCCL_IB_HCA: "rocep1s0f0,roceP2p1s0f0"
-  NCCL_IB_DISABLE: "0"
+   # ---- RoCE data plane: both CX-7 ports, merged ----
   NCCL_NET: "IB"
-  NCCL_SOCKET_IFNAME: "enp1s0f0np0"
+  NCCL_IB_DISABLE: "0"
+  NCCL_IB_HCA: "rocep1s0f0,roceP2p1s0f0"
+  NCCL_IB_MERGE_NICS: "1"
   NCCL_IB_GID_INDEX: "3"
+  NCCL_IB_ADDR_FAMILY: "AF_INET"
+  NCCL_IB_ROCE_VERSION_NUM: "2"
+  NCCL_CROSS_NIC: "1"
+  NCCL_CUMEM_ENABLE: "0"
+  NCCL_IGNORE_CPU_AFFINITY: "1"
+  NCCL_NVLS_ENABLE: "0"
   NCCL_DEBUG: "WARN"
+  # ---- control plane: rendezvous + Gloo on the 99.99.99.x link ----
+  NCCL_SOCKET_IFNAME: "enp1s0f0np0"
+  TP_SOCKET_IFNAME: "enp1s0f0np0"
+  GLOO_SOCKET_IFNAME: "enp1s0f0np0"
+  MASTER_ADDR: "99.99.99.1"
+  MASTER_PORT: "25000"
+  # ---- model + persistent JIT caches (all under the hostPath HF volume) ----
+  HF_HOME: "/cache/huggingface"
   HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+  HF_HUB_DISABLE_XET: "1"
+  VLLM_CACHE_ROOT: "/cache/huggingface/vllm-cache"
+  FLASHINFER_WORKSPACE_BASE: "/cache/huggingface/flashinfer"
+  TILELANG_CACHE_DIR: "/cache/huggingface/tilelang-cache"
+  TILELANG_CLEANUP_TEMP_FILES: "1"
+  TRITON_CACHE_DIR: "/cache/huggingface/triton-cache"
+  B12X_CUTE_COMPILE_CACHE_DIR: "/cache/huggingface/b12x-cute-cache"
+  # ---- GB10 runtime knobs ----
+  VLLM_USE_B12X_MOE: "1"
+  VLLM_USE_FLASHINFER_SAMPLER: "1"
+  VLLM_USE_BREAKABLE_CUDAGRAPH: "0"
+  VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
+  VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS: "1800"
+  VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS: "0"
+  VLLM_SPARSE_INDEXER_MAX_LOGITS_MB: "256"
+  VLLM_PREFIX_CACHE_RETENTION_INTERVAL: "4096"
+  TORCH_CUDA_ARCH_LIST: "12.1a"
+  FLASHINFER_CUDA_ARCH_LIST: "12.1a"
+  CUTE_DSL_ARCH: "sm_121a"
+  FLASHINFER_DISABLE_VERSION_CHECK: "1"
+  DG_JIT_USE_NVRTC: "0"
+  DG_JIT_NVCC_COMPILER: "/usr/local/cuda/bin/nvcc"
   PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
-  VLLM_CACHE_ROOT: "/root/.cache/vllm"
+
+  # ---- serving profile (MiaAI Vision-Exp defaults) ----
+  MODEL: {{ $lws.model.name }}
+  {{- with $lws.model.revision }}
+  MODEL_REVISION: {{ . }}
+  {{- end }}
+  SERVED_MODEL_NAME: {{ $lws.model.servedName | default "local" }}
+  VLLM_PORT: "8000"
+  MAX_MODEL_LEN: {{ $lws.model.ctxSize | quote }}
+  MAX_NUM_SEQS: {{ $lws.model.maxNumSeqs | quote }}
+  MAX_NUM_BATCHED_TOKENS: {{ $lws.model.maxNumSeqs | default 8192 | quote }}
+  GPU_MEMORY_UTILIZATION: {{ $lws.model.gpuMemLimit | default 0.835 | quote }}
+  {{- with $lws.model.mtpNumTokens }}
+  MTP_NUM_TOKENS: {{ . | quote }}
+  {{- end }}
 {{- end }}
