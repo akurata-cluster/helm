@@ -50,6 +50,14 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: 1
+          {{- with ($lws.service).ports }}
+          ports:
+          {{- range . }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+          {{- end }}
+          {{- end }}
           {{- with ($lws.probes).livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
