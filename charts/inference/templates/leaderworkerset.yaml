@@ -12,7 +12,7 @@ spec:
     leaderTemplate:
       metadata:
         labels:
-          role: leader
+          {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 10 }}
       spec:
         nodeSelector:
           kubernetes.io/hostname: {{ $lws.leaderNode }}
