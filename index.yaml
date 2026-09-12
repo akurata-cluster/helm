@@ -184,6 +184,16 @@ entries:
   inference:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-09-12T00:50:15.152327512Z"
+    description: Deploy vllm/sglang inference server via LeaderWorkerSet
+    digest: efa04c1f249cea2a0c7067cf4434d94741db08fcbc9ea30a14f6c0fa5fba04a3
+    name: inference
+    type: application
+    urls:
+    - https://github.com/akurata-cluster/helm/releases/download/inference-0.1.6/inference-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-09-12T00:47:26.338666772Z"
     description: Deploy vllm/sglang inference server via LeaderWorkerSet
     digest: 246431aed6636d6c1ac54b9dc6705d852dd1cdae3cbf2dfcdc55121540daae17
@@ -242,4 +252,4 @@ entries:
     urls:
     - https://github.com/akurata-cluster/helm/releases/download/inference-0.1.0/inference-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-12T00:47:26.338718908Z"
+generated: "2026-09-12T00:50:15.152370185Z"
