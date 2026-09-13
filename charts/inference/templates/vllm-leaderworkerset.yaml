@@ -3,10 +3,6 @@
 apiVersion: leaderworkerset.x-k8s.io/v1
 kind: LeaderWorkerSet
 metadata:
-  # Tell helm to delete this on upgrade so it restarts the whole workerset
-  annotations:
-    "helm.sh/hook": pre-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation,pre-delete
   name: {{ $name }}
 spec:
   replicas: {{ $lws.leaderReplicaCount | default 1 }}
