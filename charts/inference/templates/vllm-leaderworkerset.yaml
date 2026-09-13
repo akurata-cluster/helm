@@ -41,10 +41,10 @@ spec:
             value: "0"
           - name: VLLM_HOST_IP
             value: "99.99.99.1"
-          {{- with $deploy.env }}
+          {{- with $lws.env }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- range $varName, $varVal := $deploy.envVars }}
+          {{- range $varName, $varVal := $lws.envVars }}
           - name: {{ $varName }}
             value: {{ quote $varVal }}
           {{- end }}
@@ -114,10 +114,10 @@ spec:
             value: "1"
           - name: VLLM_HOST_IP
             value: "99.99.99.2"
-          {{- with $deploy.env }}
+          {{- with $lws.env }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- range $varName, $varVal := $deploy.envVars }}
+          {{- range $varName, $varVal := $lws.envVars }}
           - name: {{ $varName }}
             value: {{ quote $varVal }}
           {{- end }}
