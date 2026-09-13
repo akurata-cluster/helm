@@ -1,4 +1,4 @@
-{{- range $name, $lws := .Values.leaderworkersets }}
+{{- range $name, $lws := .Values.vllm }}
 ---
 apiVersion: leaderworkerset.x-k8s.io/v1
 kind: LeaderWorkerSet
@@ -41,9 +41,16 @@ spec:
             value: "0"
           - name: VLLM_HOST_IP
             value: "99.99.99.1"
-          envFrom:
-          - configMapRef:
-              name: {{ $name }}-env
+          {{- with $deploy.env }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- range $varName, $varVal := $deploy.envVars }}
+          - name: {{ $varName }}
+            value: {{ quote $varVal }}
+          {{- end }}
+          # envFrom:
+          # - configMapRef:
+          #     name: {{ $name }}-env
           {{- with $lws.envFrom }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -107,9 +114,16 @@ spec:
             value: "1"
           - name: VLLM_HOST_IP
             value: "99.99.99.2"
-          envFrom:
-          - configMapRef:
-              name: {{ $name }}-env
+          {{- with $deploy.env }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- range $varName, $varVal := $deploy.envVars }}
+          - name: {{ $varName }}
+            value: {{ quote $varVal }}
+          {{- end }}
+          # envFrom:
+          # - configMapRef:
+          #     name: {{ $name }}-env
           {{- with $lws.envFrom }}
           {{- toYaml . | nindent 10 }}
           {{- end }}

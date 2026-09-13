@@ -1,4 +1,5 @@
-{{- range $name, $lws := .Values.leaderworkersets }}
+{{- $allSets := concat .Values.vllm .Values.sglang -}}
+{{- range $name, $lws := $allSets }}
 {{- if $lws.service }}
 {{- if ($lws.service.ingress).enabled }}
 ---
