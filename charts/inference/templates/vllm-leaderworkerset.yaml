@@ -73,7 +73,8 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: scripts
-              mountPath: /scripts
+              mountPath: /scripts/entrypoint.sh
+              subPath: leader-entrypoint.sh
             {{- with $lws.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -88,6 +89,9 @@ spec:
             configMap:
               name: {{ $name }}-entrypoint-script
               defaultMode: 0755
+              items:
+                - key: leader-entrypoint.sh
+                  path: leader-entrypoint.sh
           {{- with $lws.volumes }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -132,7 +136,8 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: scripts
-              mountPath: /scripts
+              mountPath: /scripts/entrypoint.sh
+              subPath: worker-entrypoint.sh
             {{- with $lws.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -147,6 +152,9 @@ spec:
             configMap:
               name: {{ $name }}-entrypoint-script
               defaultMode: 0755
+              items:
+                - key: worker-entrypoint.sh
+                  path: worker-entrypoint.sh
           {{- with $lws.volumes }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
