@@ -1,4 +1,4 @@
-{{- $allSets := concat .Values.vllm .Values.sglang -}}
+{{- $allSets := merge (dict) .Values.vllm .Values.sglang -}}
 {{- range $name, $lws := $allSets }}
 {{- if $lws.service }}
 {{- if ($lws.service.ingress).enabled }}
