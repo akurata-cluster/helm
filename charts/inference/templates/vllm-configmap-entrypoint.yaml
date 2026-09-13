@@ -1,0 +1,10 @@
+{{- range $name, $lws := .Values.vllm }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-entrypoint-script
+data:
+  entrypoint.sh: |
+    {{- $lws.entrypointScript | nindent 4 }}
+{{- end }}

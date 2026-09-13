@@ -1,0 +1,11 @@
+{{- range $name, $lws := .Values.vllm }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-env
+data:
+{{- range $varName, $varVal := $lws.envConfig }}
+  {{ $varName }}: "{{ $varVal }}"
+{{- end }}
+{{- end }}

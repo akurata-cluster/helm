@@ -32,25 +32,15 @@ spec:
             privileged: true
             capabilities:
               add: ["IPC_LOCK"]
-          command: ["/bin/bash", "-lc"]
-          args:
-          - |
-            {{- $lws.leaderCommand | nindent 12 }}
+          command: ["/bin/bash", "-l", "/scripts/entrypoint.sh"]
           env:
           - name: NODE_RANK
             value: "0"
           - name: VLLM_HOST_IP
             value: "99.99.99.1"
-          {{- with $lws.env }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- range $varName, $varVal := $lws.envVars }}
-          - name: {{ $varName }}
-            value: {{ quote $varVal }}
-          {{- end }}
-          # envFrom:
-          # - configMapRef:
-          #     name: {{ $name }}-env
+          envFrom:
+          - configMapRef:
+              name: {{ $name }}-env
           {{- with $lws.envFrom }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -105,25 +95,15 @@ spec:
             privileged: true
             capabilities:
               add: ["IPC_LOCK"]
-          command: ["/bin/bash", "-lc"]
-          args:
-          - |
-            {{- $lws.workerCommand | nindent 12 }}
+          command: ["/bin/bash", "-l", "/scripts/entrypoint.sh"]
           env:
           - name: NODE_RANK
             value: "1"
           - name: VLLM_HOST_IP
             value: "99.99.99.2"
-          {{- with $lws.env }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- range $varName, $varVal := $lws.envVars }}
-          - name: {{ $varName }}
-            value: {{ quote $varVal }}
-          {{- end }}
-          # envFrom:
-          # - configMapRef:
-          #     name: {{ $name }}-env
+          envFrom:
+          - configMapRef:
+              name: {{ $name }}-env
           {{- with $lws.envFrom }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
