@@ -71,14 +71,30 @@ spec:
           startupProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $lws.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-        {{- with $lws.volumes }}
+            - name: dshm
+              mountPath: /dev/shm
+            - name: tmp
+              mountPath: /tmp
+            - name: scripts
+              mountPath: /scripts
+            {{- with $lws.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
         volumes:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
+          - name: dshm
+            emptyDir:
+              medium: Memory
+              sizeLimit: {{ $lws.dshmSize | default "64Gi" }}
+          - name: tmp
+            emptyDir: {}
+          - name: scripts
+            configMap:
+              name: entrypoint-script
+              defaultMode: 0755
+          {{- with $lws.volumes }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
     workerTemplate:
       spec:
         nodeSelector:
@@ -114,12 +130,28 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: 1
-          {{- with $lws.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-        {{- with $lws.volumes }}
+            - name: dshm
+              mountPath: /dev/shm
+            - name: tmp
+              mountPath: /tmp
+            - name: scripts
+              mountPath: /scripts
+            {{- with $lws.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
         volumes:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
+          - name: dshm
+            emptyDir:
+              medium: Memory
+              sizeLimit: {{ $lws.dshmSize | default "64Gi" }}
+          - name: tmp
+            emptyDir: {}
+          - name: scripts
+            configMap:
+              name: entrypoint-script
+              defaultMode: 0755
+          {{- with $lws.volumes }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
 {{- end }}
