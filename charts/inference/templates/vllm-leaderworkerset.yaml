@@ -86,7 +86,7 @@ spec:
             emptyDir: {}
           - name: scripts
             configMap:
-              name: entrypoint-script
+              name: {{ $name }}-entrypoint-script
               defaultMode: 0755
           {{- with $lws.volumes }}
             {{- toYaml . | nindent 10 }}
@@ -145,7 +145,7 @@ spec:
             emptyDir: {}
           - name: scripts
             configMap:
-              name: entrypoint-script
+              name: {{ $name }}-entrypoint-script
               defaultMode: 0755
           {{- with $lws.volumes }}
             {{- toYaml . | nindent 10 }}
