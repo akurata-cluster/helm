@@ -13,6 +13,9 @@ spec:
   selector:
     matchLabels:
       {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
+  {{- with $deploy.shareProcessNamespace }}
+  shareProcessNamespace: {{ . }}
+  {{- end }}
   template:
     metadata:
       {{- with $deploy.podAnnotations }}
