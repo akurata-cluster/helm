@@ -13,9 +13,6 @@ spec:
   selector:
     matchLabels:
       {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
-  {{- with $deploy.shareProcessNamespace }}
-  shareProcessNamespace: {{ . }}
-  {{- end }}
   template:
     metadata:
       {{- with $deploy.podAnnotations }}
@@ -43,6 +40,9 @@ spec:
         fsGroupChangePolicy: {{ dig "podSecurityContext" "fsGroupChangePolicy" "OnRootMismatch" $deploy }}
         seccompProfile:
           type: {{ dig "podSecurityContext" "seccompProfile" "type" "RuntimeDefault" $deploy }}
+      {{- end }}
+      {{- with $deploy.shareProcessNamespace }}
+      shareProcessNamespace: {{ . }}
       {{- end }}
       {{- with $deploy.runtimeClassName }}
       runtimeClassName: {{ . }}
