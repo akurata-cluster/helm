@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: {{ $name }}-entrypoint-script
 data:
-  leader-entrypoint.sh: |
+  leader-entrypoint.sh: |+
     {{- $lws.leaderEntrypointScript | default $lws.entrypointScript | nindent 4 }}
-    {{- "" | println }}
-  worker-entrypoint.sh: |
+    
+  worker-entrypoint.sh: |+
     {{- $lws.workerEntrypointScript | default $lws.entrypointScript | nindent 4 }}
-    {{- "" | println }}
+    
 {{- end }}
