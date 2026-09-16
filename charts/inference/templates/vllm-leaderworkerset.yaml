@@ -15,7 +15,7 @@ spec:
           {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 10 }}
       spec:
         nodeSelector:
-          kubernetes.io/hostname: {{ $lws.leaderNode }}
+          kubernetes.io/hostname: {{ $lws.leader.nodeName }}
         runtimeClassName: nvidia
         hostNetwork: true
         hostIPC: true
@@ -98,7 +98,7 @@ spec:
     workerTemplate:
       spec:
         nodeSelector:
-          kubernetes.io/hostname: {{ $lws.workerNode }}
+          kubernetes.io/hostname: {{ $lws.worker.nodeName }}
         runtimeClassName: nvidia
         hostNetwork: true
         hostIPC: true
