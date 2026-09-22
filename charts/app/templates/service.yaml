@@ -19,7 +19,7 @@ spec:
   {{- range $deploy.service.ports }}
     - port: {{ .port | default .containerPort }}
       targetPort: {{ .name }}
-      protocol: {{ .protocol }}
+      protocol: {{ .protocol | default "TCP" }}
       name: {{ .name }}
   {{- end }}
   {{- with $deploy.sidecar }}
@@ -27,7 +27,7 @@ spec:
   {{- range .ports }}
     - port: {{ .port | default .containerPort }}
       targetPort: {{ .name }}
-      protocol: {{ .protocol }}
+      protocol: {{ .protocol | default "TCP" }}
       name: {{ .name }}
   {{- end }}
   {{- end }}

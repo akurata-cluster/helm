@@ -29,7 +29,19 @@ spec:
     host: {{ $deploy.service.ingress.host }}
     {{- else }}
     host: {{ $name }}.app.home
-    {{- end }} 
+    {{- end }}
+  {{- range $addlHost := ($deploy.service.ingress).additionalHosts }}
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ $name }}
+            port:
+              name: {{ $addlHost.port }}
+        path: /
+        pathType: ImplementationSpecific
+    host: {{ $addlHost.host }}
+  {{- end }}
 {{- if ne ($deploy.service.ingress).tls false }}
 ---
 apiVersion: traefik.io/v1alpha1

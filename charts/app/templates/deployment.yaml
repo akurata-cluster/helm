@@ -104,7 +104,7 @@ spec:
           {{- range . }}
             - name: {{ .name }}
               containerPort: {{ .containerPort }}
-              protocol: {{ .protocol }}
+              protocol: {{ .protocol | default "TCP" }}
           {{- end }}
           {{- end }}
           {{- with $deploy.probes }}
