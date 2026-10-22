@@ -25,6 +25,7 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
+  volumeMode: Filesystem
   claimRef:
     apiVersion: v1
     kind: PersistentVolumeClaim
@@ -46,7 +47,6 @@ spec:
       capacity: 5Gi
       mounter: geesefs
       options: --memory-limit 1000 --dir-mode 0777 --file-mode 0666
-    volumeMode: Filesystem
 {{- else }}
 ---
 apiVersion: v1
