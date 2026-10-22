@@ -1,4 +1,53 @@
 {{- range $name, $volume := .Values.volumes }}
+{{- if eq ($volume).type "s3" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: "" # Intentionally no storage class to manually configure yandex driver
+  volumeName: s3-{{ $name }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: s3-{{ $name }}
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    namespace: {{ $.Release.Namespace }}
+    name: {{ $name }}
+  csi:
+    driver: ru.yandex.s3.csi
+    volumeHandle: akurata-cluster/{{ $volume.bucketPath | default $name }}
+    controllerPublishSecretRef:
+      name: csi-s3-r2-secret
+      namespace: kube-system
+    nodePublishSecretRef:
+      name: csi-s3-r2-secret
+      namespace: kube-system
+    nodeStageSecretRef:
+      name: csi-s3-r2-secret
+      namespace: kube-system
+    volumeAttributes:
+      capacity: 5Gi
+      mounter: geesefs
+      options: --memory-limit 1000 --dir-mode 0777 --file-mode 0666
+    volumeMode: Filesystem
+{{- else }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -14,4 +63,5 @@ spec:
   {{- with $volume.volumeName }}
   volumeName: {{ . }}
   {{- end }}
+{{- end }}
 {{- end }}
