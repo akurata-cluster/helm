@@ -40,6 +40,8 @@ spec:
         fsGroupChangePolicy: {{ dig "podSecurityContext" "fsGroupChangePolicy" "OnRootMismatch" $deploy }}
         seccompProfile:
           type: {{ dig "podSecurityContext" "seccompProfile" "type" "RuntimeDefault" $deploy }}
+        appArmorProfile:
+          type: {{ dig "podSecurityContext" "appArmorProfile" "type" "Unconfined" $deploy }}
       {{- end }}
       {{- with $deploy.shareProcessNamespace }}
       shareProcessNamespace: {{ . }}
