@@ -13,6 +13,7 @@ spec:
   selector:
     matchLabels:
       {{- include "selectorLabels" (dict "name" $name "ctx" $) | nindent 6 }}
+  revisionHistoryLimit: {{ $deploy.revisionHistoryLimit | default 5 }}
   template:
     metadata:
       {{- with $deploy.podAnnotations }}
